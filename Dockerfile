@@ -62,6 +62,7 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-RUN echo '#!/bin/bash\nphp artisan config:clear\napache2-foreground' > /start.sh && chmod +x /start.sh
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 CMD ["/start.sh"]
