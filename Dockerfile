@@ -62,10 +62,7 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-# Create .env and cache config before starting
-RUN touch .env
-RUN php artisan config:cache || true
-RUN php artisan route:cache || true
-RUN php artisan view:cache || true
+# Only create .env if it doesn't exist (don't overwrite Render env vars)
+RUN [ -f .env ] || touch .env
 
 CMD ["apache2-foreground"]
