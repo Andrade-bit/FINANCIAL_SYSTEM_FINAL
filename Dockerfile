@@ -127,4 +127,4 @@ EXPOSE 10000
 
 
 
-CMD bash -c "php artisan key:generate --force && php artisan config:clear && php artisan migrate --force; apache2-foreground"
+CMD ["apache2-foreground"]
