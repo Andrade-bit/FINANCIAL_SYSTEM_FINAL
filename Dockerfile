@@ -62,4 +62,4 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-CMD bash -c "printf 'APP_NAME=Laravel\nAPP_ENV=production\nAPP_KEY=${APP_KEY}\nAPP_DEBUG=false\nAPP_URL=${APP_URL}\nDB_CONNECTION=mysql\nDB_HOST=${DB_HOST}\nDB_PORT=${DB_PORT}\nDB_DATABASE=${DB_DATABASE}\nDB_USERNAME=${DB_USERNAME}\nDB_PASSWORD=${DB_PASSWORD}\nSESSION_DRIVER=file\nCACHE_STORE=file\nQUEUE_CONNECTION=database\n' > /var/www/html/.env && php artisan config:clear && apache2-foreground"
+CMD bash -c "php artisan config:clear 2>/dev/null; apache2ctl -D FOREGROUND 2>&1 | tee /proc/1/fd/1"
