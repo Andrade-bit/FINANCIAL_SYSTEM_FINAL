@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('usersID');
             $table->string('firstName');
             $table->string('middleName')->nullable();
             $table->string('lastName');
             $table->string('username')->unique();
             $table->string('password');
-            $table->string('role'); // admin, treasurer, encoder
-            $table->string('status')->default('Active');
+            $table->enum('role', ['admin', 'treasurer', 'encoder'])->default('encoder');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -24,5 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
+        Schema::dropIfExists('users');
     }
 };
