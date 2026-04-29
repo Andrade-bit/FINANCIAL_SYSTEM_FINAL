@@ -45,15 +45,15 @@ WORKDIR /var/www/html
 # Copy full Laravel app
 COPY . .
 
+# Remove local .env so it doesn't override Render environment variables
+RUN rm -f .env
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Install frontend dependencies and build Vite assets
 RUN npm install
 RUN npm run build
-
-# Create storage symlink for public files
-RUN php artisan storage:link || true
 
 # Set permissions
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache public/uploads \
@@ -62,4 +62,4 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-CMD bash -c "php artisan config:clear 2>/dev/null; apache2ctl -D FOREGROUND 2>&1 | tee /proc/1/fd/1"
+CMD ["apache2-foreground"]
