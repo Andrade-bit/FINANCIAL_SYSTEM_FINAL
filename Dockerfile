@@ -62,7 +62,6 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-# Only create .env if it doesn't exist (don't overwrite Render env vars)
-RUN [ -f .env ] || touch .env
+RUN echo '#!/bin/bash\nphp artisan config:clear\napache2-foreground' > /start.sh && chmod +x /start.sh
 
-CMD ["apache2-foreground"]
+CMD ["/start.sh"]
