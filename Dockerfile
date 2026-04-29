@@ -90,6 +90,7 @@ WORKDIR /var/www/html
 
 COPY --chown=www-data:www-data . .
 
+RUN cp .env.example .env
 
 
 # Install PHP dependencies
