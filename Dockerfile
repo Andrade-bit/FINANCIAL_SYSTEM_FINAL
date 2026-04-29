@@ -126,4 +126,4 @@ EXPOSE 10000
 
 
 
-CMD bash -c "php artisan config:clear && php artisan migrate:fresh --force && apache2-foreground"
+CMD bash -c "php artisan config:clear && php artisan migrate:fresh --force; apache2-foreground"
