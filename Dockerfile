@@ -62,4 +62,5 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 10000
 
-CMD ["apache2-foreground"]
+# Copy secret .env from Render's secret file location, run migrations, then start Apache
+CMD bash -c "cp /etc/secrets/.env /var/www/html/.env && php artisan config:clear && php artisan migrate --force && apache2-foreground"
