@@ -88,7 +88,7 @@ WORKDIR /var/www/html
 
 # Copy full Laravel app
 
-COPY . .
+COPY --chown=www-data:www-data . .
 
 
 
