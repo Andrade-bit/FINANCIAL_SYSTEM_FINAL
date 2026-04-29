@@ -8,27 +8,49 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // ── Encoder: add money ──────────────────────────────────────────────
+        // 1. encoderaddmoney
         Schema::create('encoderaddmoney', function (Blueprint $table) {
-            $table->bigIncrements('encoderAddmoneyID');
+            $table->id('encoderAddmoneyID');
             $table->decimal('amount', 15, 2)->default(0.00);
             $table->string('description')->nullable();
             $table->date('date');
             $table->timestamps();
         });
 
-        // ── Encoder: add expenses ───────────────────────────────────────────
+        // 2. encoderaddexpenses
         Schema::create('encoderaddexpenses', function (Blueprint $table) {
-            $table->bigIncrements('encoderAddexpensesID');
+            $table->id('encoderAddexpensesID');
             $table->decimal('amount', 15, 2)->default(0.00);
             $table->string('description')->nullable();
             $table->date('date');
             $table->timestamps();
         });
 
-        // ── Encoder transactions ────────────────────────────────────────────
+        // 3. encoders
+        Schema::create('encoders', function (Blueprint $table) {
+            $table->id('encodersID');
+            $table->unsignedBigInteger('encoderTransactionsID')->nullable();
+            $table->unsignedBigInteger('encoderAddmoneyID')->nullable();
+            $table->unsignedBigInteger('encoderAddexpensesID')->nullable();
+            $table->unsignedBigInteger('usersID');
+            $table->timestamps();
+
+            $table->foreign('usersID', 'fk_encoders_user')
+                ->references('usersID')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
+
+            $table->foreign('encoderAddmoneyID', 'fk_encoders_addmoney')
+                ->references('encoderAddmoneyID')->on('encoderaddmoney')
+                ->onDelete('set null')->onUpdate('cascade');
+
+            $table->foreign('encoderAddexpensesID', 'fk_encoders_addexpenses')
+                ->references('encoderAddexpensesID')->on('encoderaddexpenses')
+                ->onDelete('set null')->onUpdate('cascade');
+        });
+
+        // 4. encoder_transactions
         Schema::create('encoder_transactions', function (Blueprint $table) {
-            $table->bigIncrements('encoderTransactionsID');
+            $table->id('encoderTransactionsID');
             $table->unsignedBigInteger('usersID');
             $table->unsignedBigInteger('encoderAddmoneyID')->nullable();
             $table->unsignedBigInteger('encoderAddexpensesID')->nullable();
@@ -42,61 +64,39 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('usersID', 'fk_enc_transaction_user')
-                  ->references('usersID')->on('users')
-                  ->onDelete('cascade')->onUpdate('cascade');
+                ->references('usersID')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
 
             $table->foreign('encoderAddmoneyID', 'fk_enc_transaction_addmoney')
-                  ->references('encoderAddmoneyID')->on('encoderaddmoney')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('encoderAddmoneyID')->on('encoderaddmoney')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('encoderAddexpensesID', 'fk_enc_transaction_addexpenses')
-                  ->references('encoderAddexpensesID')->on('encoderaddexpenses')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('encoderAddexpensesID')->on('encoderaddexpenses')
+                ->onDelete('set null')->onUpdate('cascade');
         });
 
-        // ── Encoders (pivot/profile) ────────────────────────────────────────
-        Schema::create('encoders', function (Blueprint $table) {
-            $table->bigIncrements('encodersID');
-            $table->unsignedBigInteger('encoderTransactionsID')->nullable();
-            $table->unsignedBigInteger('encoderAddmoneyID')->nullable();
-            $table->unsignedBigInteger('encoderAddexpensesID')->nullable();
-            $table->unsignedBigInteger('usersID');
-            $table->timestamps();
-
-            $table->foreign('usersID', 'fk_encoders_user')
-                  ->references('usersID')->on('users')
-                  ->onDelete('cascade')->onUpdate('cascade');
-
-            $table->foreign('encoderAddmoneyID', 'fk_encoders_addmoney')
-                  ->references('encoderAddmoneyID')->on('encoderaddmoney')
-                  ->onDelete('set null')->onUpdate('cascade');
-
-            $table->foreign('encoderAddexpensesID', 'fk_encoders_addexpenses')
-                  ->references('encoderAddexpensesID')->on('encoderaddexpenses')
-                  ->onDelete('set null')->onUpdate('cascade');
-        });
-
-        // ── Treasurer: add money ────────────────────────────────────────────
+        // 5. treasureraddmoney
         Schema::create('treasureraddmoney', function (Blueprint $table) {
-            $table->bigIncrements('treasurerAddmoneyID');
+            $table->id('treasurerAddmoneyID');
             $table->decimal('amount', 15, 2)->default(0.00);
             $table->string('description')->nullable();
             $table->date('date');
             $table->timestamps();
         });
 
-        // ── Treasurer: add expenses ─────────────────────────────────────────
+        // 6. treasureraddexpenses
         Schema::create('treasureraddexpenses', function (Blueprint $table) {
-            $table->bigIncrements('treasurerAddexpensesID');
+            $table->id('treasurerAddexpensesID');
             $table->decimal('amount', 15, 2)->default(0.00);
             $table->string('description')->nullable();
             $table->date('date');
             $table->timestamps();
         });
 
-        // ── Treasurer dashboard ─────────────────────────────────────────────
+        // 7. treasurer_dashboard
         Schema::create('treasurer_dashboard', function (Blueprint $table) {
-            $table->bigIncrements('treasurerDashboardID');
+            $table->id('treasurerDashboardID');
             $table->unsignedBigInteger('usersID')->unique();
             $table->decimal('total_balance', 15, 2)->default(0.00);
             $table->decimal('total_collections', 15, 2)->default(0.00);
@@ -104,13 +104,13 @@ return new class extends Migration
             $table->text('monthly_overview')->nullable();
 
             $table->foreign('usersID', 'fk_dashboard_user')
-                  ->references('usersID')->on('users')
-                  ->onDelete('cascade')->onUpdate('cascade');
+                ->references('usersID')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
         });
 
-        // ── Treasurer transactions ──────────────────────────────────────────
+        // 8. treasurer_transactions
         Schema::create('treasurer_transactions', function (Blueprint $table) {
-            $table->bigIncrements('treasurerTransactionsID');
+            $table->id('treasurerTransactionsID');
             $table->unsignedBigInteger('usersID');
             $table->unsignedBigInteger('treasurerAddmoneyID')->nullable();
             $table->unsignedBigInteger('treasurerAddexpensesID')->nullable();
@@ -127,53 +127,53 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('usersID', 'fk_transaction_user')
-                  ->references('usersID')->on('users')
-                  ->onDelete('cascade')->onUpdate('cascade');
+                ->references('usersID')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
 
             $table->foreign('treasurerAddmoneyID', 'fk_transaction_addmoney')
-                  ->references('treasurerAddmoneyID')->on('treasureraddmoney')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerAddmoneyID')->on('treasureraddmoney')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('treasurerAddexpensesID', 'fk_transaction_addexpenses')
-                  ->references('treasurerAddexpensesID')->on('treasureraddexpenses')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerAddexpensesID')->on('treasureraddexpenses')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('approved_by', 'fk_transaction_approved_by')
-                  ->references('usersID')->on('users')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('usersID')->on('users')
+                ->onDelete('set null')->onUpdate('cascade');
         });
 
-        // ── Treasurer quick actions ─────────────────────────────────────────
+        // 9. treasurerquickacts
         Schema::create('treasurerquickacts', function (Blueprint $table) {
-            $table->bigIncrements('treasurerQuickactsID');
+            $table->id('treasurerQuickactsID');
             $table->enum('actions', ['approve', 'no'])->default('no');
             $table->unsignedBigInteger('encoderAddmoneyID')->nullable();
             $table->unsignedBigInteger('encoderAddexpensesID')->nullable();
             $table->timestamps();
 
             $table->foreign('encoderAddmoneyID', 'fk_quickacts_addmoney')
-                  ->references('encoderAddmoneyID')->on('encoderaddmoney')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('encoderAddmoneyID')->on('encoderaddmoney')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('encoderAddexpensesID', 'fk_quickacts_addexpenses')
-                  ->references('encoderAddexpensesID')->on('encoderaddexpenses')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('encoderAddexpensesID')->on('encoderaddexpenses')
+                ->onDelete('set null')->onUpdate('cascade');
         });
 
-        // ── Treasurer reports ───────────────────────────────────────────────
+        // 10. treasurerreports
         Schema::create('treasurerreports', function (Blueprint $table) {
-            $table->bigIncrements('treasurerReportsID');
+            $table->id('treasurerReportsID');
             $table->unsignedBigInteger('treasurerTransactionsID')->nullable();
             $table->timestamps();
 
             $table->foreign('treasurerTransactionsID', 'fk_reports_transaction')
-                  ->references('treasurerTransactionsID')->on('treasurer_transactions')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerTransactionsID')->on('treasurer_transactions')
+                ->onDelete('set null')->onUpdate('cascade');
         });
 
-        // ── Treasurers (pivot/profile) ──────────────────────────────────────
+        // 11. treasurers
         Schema::create('treasurers', function (Blueprint $table) {
-            $table->bigIncrements('treasurersID');
+            $table->id('treasurersID');
             $table->unsignedBigInteger('treasurerDashboardID')->nullable();
             $table->unsignedBigInteger('treasurerQuickactsID')->nullable();
             $table->unsignedBigInteger('treasurerAddexpensesID')->nullable();
@@ -183,30 +183,29 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('usersID', 'fk_treasurers_user')
-                  ->references('usersID')->on('users')
-                  ->onDelete('cascade')->onUpdate('cascade');
+                ->references('usersID')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
 
             $table->foreign('treasurerDashboardID', 'fk_treasurers_dashboard')
-                  ->references('treasurerDashboardID')->on('treasurer_dashboard')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerDashboardID')->on('treasurer_dashboard')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('treasurerQuickactsID', 'fk_treasurers_quickacts')
-                  ->references('treasurerQuickactsID')->on('treasurerquickacts')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerQuickactsID')->on('treasurerquickacts')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('treasurerAddexpensesID', 'fk_treasurers_addexpenses')
-                  ->references('treasurerAddexpensesID')->on('treasureraddexpenses')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerAddexpensesID')->on('treasureraddexpenses')
+                ->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('treasurerAddmoneyID', 'fk_treasurers_addmoney')
-                  ->references('treasurerAddmoneyID')->on('treasureraddmoney')
-                  ->onDelete('set null')->onUpdate('cascade');
+                ->references('treasurerAddmoneyID')->on('treasureraddmoney')
+                ->onDelete('set null')->onUpdate('cascade');
         });
     }
 
     public function down(): void
     {
-        // Drop in reverse order of foreign key dependencies
         Schema::dropIfExists('treasurers');
         Schema::dropIfExists('treasurerreports');
         Schema::dropIfExists('treasurerquickacts');
@@ -214,8 +213,8 @@ return new class extends Migration
         Schema::dropIfExists('treasurer_dashboard');
         Schema::dropIfExists('treasureraddexpenses');
         Schema::dropIfExists('treasureraddmoney');
-        Schema::dropIfExists('encoders');
         Schema::dropIfExists('encoder_transactions');
+        Schema::dropIfExists('encoders');
         Schema::dropIfExists('encoderaddexpenses');
         Schema::dropIfExists('encoderaddmoney');
     }
