@@ -231,6 +231,57 @@
             transform: translateY(0);
         }
 
+        /* ── PAGINATION ── */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            background: white;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pagination-info {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-btn:hover:not(:disabled) {
+            background: #f0f2f5;
+            border-color: #d1d5db;
+        }
+        .page-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         /* ===================== RESPONSIVE ===================== */
 
         /* Tablet: 481px – 768px */
@@ -427,6 +478,12 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Bar -->
+            <div class="pagination-bar" id="paginationBar">
+                <span class="pagination-info" id="paginationInfo"></span>
+                <div class="pagination-controls" id="paginationControls"></div>
+            </div>
         </div>
     </div>
 
@@ -473,18 +530,93 @@ function closeSidebar() {
     document.body.style.overflow = '';
 }
 
-function filterTable() {
+// ── PAGINATION + FILTER ──
+const ROWS_PER_PAGE = 10;
+let currentPage = 1;
+
+function getVisibleRows() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const type   = document.getElementById('typeFilter').value.toLowerCase();
     const status = document.getElementById('statusFilter').value.toLowerCase();
+    const rows   = Array.from(document.querySelectorAll('#txTable tbody tr[data-type]'));
 
-    document.querySelectorAll('#txTable tbody tr[data-search]').forEach(row => {
+    return rows.filter(row => {
         const matchSearch = !search || row.dataset.search.includes(search);
-        const matchType   = !type   || row.dataset.type   === type;
+        const matchType   = !type   || row.dataset.type === type;
         const matchStatus = !status || row.dataset.status === status;
-        row.style.display = (matchSearch && matchType && matchStatus) ? '' : 'none';
+        return matchSearch && matchType && matchStatus;
     });
 }
+
+function renderPage() {
+    const allRows    = Array.from(document.querySelectorAll('#txTable tbody tr[data-type]'));
+    const visible    = getVisibleRows();
+    const totalRows  = visible.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / ROWS_PER_PAGE));
+
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * ROWS_PER_PAGE;
+    const end   = start + ROWS_PER_PAGE;
+
+    allRows.forEach(row => row.style.display = 'none');
+    visible.forEach((row, i) => {
+        row.style.display = (i >= start && i < end) ? '' : 'none';
+    });
+
+    // Info text
+    const infoEl = document.getElementById('paginationInfo');
+    if (totalRows === 0) {
+        infoEl.textContent = 'No results';
+    } else {
+        infoEl.textContent = `Showing ${start + 1}–${Math.min(end, totalRows)} of ${totalRows} transactions`;
+    }
+
+    // Controls
+    const controlsEl = document.getElementById('paginationControls');
+    controlsEl.innerHTML = '';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-btn';
+    prevBtn.textContent = '‹';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener('click', () => { currentPage--; renderPage(); });
+    controlsEl.appendChild(prevBtn);
+
+    const range = 2;
+    for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - range && p <= currentPage + range)) {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+            btn.textContent = p;
+            btn.addEventListener('click', (pg => () => { currentPage = pg; renderPage(); })(p));
+            controlsEl.appendChild(btn);
+        } else if (p === currentPage - range - 1 || p === currentPage + range + 1) {
+            const dots = document.createElement('span');
+            dots.textContent = '…';
+            dots.style.cssText = 'padding: 0 4px; color: var(--text-muted); font-size: 0.8rem; line-height: 32px;';
+            controlsEl.appendChild(dots);
+        }
+    }
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-btn';
+    nextBtn.textContent = '›';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener('click', () => { currentPage++; renderPage(); });
+    controlsEl.appendChild(nextBtn);
+
+    document.getElementById('paginationBar').style.display =
+        allRows.length === 0 ? 'none' : 'flex';
+}
+
+function filterTable() {
+    currentPage = 1;
+    renderPage();
+}
+
+// Init on load
+renderPage();
 </script>
 </body>
 </html>
