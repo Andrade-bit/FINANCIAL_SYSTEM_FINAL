@@ -118,9 +118,10 @@
             text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
         }
         .stat-value {
-            font-size: 1.9rem; font-weight: 700;
-            letter-spacing: -0.02em; color: var(--text-main); margin-bottom: 4px;
-        }
+    font-size: 1.9rem; font-weight: 700;
+    letter-spacing: -0.02em; color: var(--text-main); margin-bottom: 4px;
+    text-align: right;
+}
         .stat-desc { font-size: 0.76rem; color: var(--text-muted); }
 
         /* TABLE CARD */
