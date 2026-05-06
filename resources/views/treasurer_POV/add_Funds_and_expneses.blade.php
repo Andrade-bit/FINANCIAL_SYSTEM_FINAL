@@ -609,7 +609,7 @@ function showToast(msg, isError = false) {
 }
 
 // ── PAGINATION + SEARCH ────────────────────────────────────────────
-const ROWS_PER_PAGE = 10;
+const ROWS_PER_PAGE = 6;
 let currentPage = 1;
 
 function getVisibleRows() {

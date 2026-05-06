@@ -460,7 +460,7 @@
     if (overlay)    overlay.addEventListener('click', toggleMenu);
 
     // ── PAGINATION + FILTER ──
-    const ROWS_PER_PAGE = 10;
+    const ROWS_PER_PAGE = 6;
     let currentPage = 1;
 
     function getVisibleRows() {
