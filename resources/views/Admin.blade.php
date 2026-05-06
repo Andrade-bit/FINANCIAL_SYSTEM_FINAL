@@ -251,6 +251,57 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* ── PAGINATION ── */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            background: white;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pagination-info {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-btn:hover:not(:disabled) {
+            background: #f0f2f5;
+            border-color: #d1d5db;
+        }
+        .page-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -326,6 +377,10 @@
                             <tbody id="dashboard-table"></tbody>
                         </table>
                     </div>
+                    <div class="pagination-bar" id="dashboard-pagination-bar">
+                        <span class="pagination-info" id="dashboard-pagination-info"></span>
+                        <div class="pagination-controls" id="dashboard-pagination-controls"></div>
+                    </div>
                 </div>
             </div>
 
@@ -342,6 +397,10 @@
                             </thead>
                             <tbody id="accounts-table"></tbody>
                         </table>
+                    </div>
+                    <div class="pagination-bar" id="accounts-pagination-bar">
+                        <span class="pagination-info" id="accounts-pagination-info"></span>
+                        <div class="pagination-controls" id="accounts-pagination-controls"></div>
                     </div>
                 </div>
             </div>
@@ -415,6 +474,11 @@ let accounts = JSON.parse('<?php /** @var \Illuminate\Support\Collection $users 
 let editId = null, deleteId = null;
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
+// ── PAGINATION STATE ──────────────────────────────────────────────
+const ROWS_PER_PAGE = 6;
+let dashboardPage = 1;
+let accountsPage  = 1;
+
 // Helper to toggle mobile sidebar
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('mobile-open');
@@ -423,21 +487,96 @@ function toggleSidebar() {
 function fullName(a) { return [a.firstName, a.middleName, a.lastName].filter(Boolean).join(' '); }
 function getInitials(a) { return (a.firstName[0] + a.lastName[0]).toUpperCase(); }
 
+// ── PAGINATION RENDERER ───────────────────────────────────────────
+function renderPagination(tableId, barId, infoId, controlsId, rows, currentPage, onPageChange) {
+    const totalRows  = rows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / ROWS_PER_PAGE));
+    const start      = (currentPage - 1) * ROWS_PER_PAGE;
+    const end        = start + ROWS_PER_PAGE;
+    const pageRows   = rows.slice(start, end);
+
+    // Info
+    const infoEl = document.getElementById(infoId);
+    infoEl.textContent = totalRows === 0
+        ? 'No accounts found'
+        : `Showing ${start + 1}–${Math.min(end, totalRows)} of ${totalRows} accounts`;
+
+    // Controls
+    const controlsEl = document.getElementById(controlsId);
+    controlsEl.innerHTML = '';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-btn';
+    prevBtn.textContent = '‹';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener('click', () => onPageChange(currentPage - 1));
+    controlsEl.appendChild(prevBtn);
+
+    const range = 2;
+    for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - range && p <= currentPage + range)) {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+            btn.textContent = p;
+            btn.addEventListener('click', (pg => () => onPageChange(pg))(p));
+            controlsEl.appendChild(btn);
+        } else if (p === currentPage - range - 1 || p === currentPage + range + 1) {
+            const dots = document.createElement('span');
+            dots.textContent = '…';
+            dots.style.cssText = 'padding: 0 4px; color: var(--text-muted); font-size: 0.8rem; line-height: 32px;';
+            controlsEl.appendChild(dots);
+        }
+    }
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-btn';
+    nextBtn.textContent = '›';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener('click', () => onPageChange(currentPage + 1));
+    controlsEl.appendChild(nextBtn);
+
+    // Show/hide pagination bar
+    document.getElementById(barId).style.display = totalRows === 0 ? 'none' : 'flex';
+
+    return pageRows;
+}
+
 function renderDashboard() {
-    document.getElementById('dashboard-table').innerHTML = accounts.map(a => `
+    const pageRows = renderPagination(
+        'dashboard-table',
+        'dashboard-pagination-bar',
+        'dashboard-pagination-info',
+        'dashboard-pagination-controls',
+        accounts,
+        dashboardPage,
+        (pg) => { dashboardPage = pg; renderDashboard(); }
+    );
+
+    document.getElementById('dashboard-table').innerHTML = pageRows.map(a => `
         <tr>
             <td><div class="name-cell"><div class="avatar ${a.role==='Treasurer'?'av-t':'av-e'}">${getInitials(a)}</div>${fullName(a)}</div></td>
             <td style="color:var(--text-muted)">${a.username}</td>
             <td><span class="badge ${a.role==='Treasurer'?'badge-treasurer':'badge-encoder'}">${a.role}</span></td>
             <td><span class="badge ${a.status==='Active'?'badge-active':'badge-inactive'}">${a.status}</span></td>
         </tr>`).join('');
+
     document.getElementById('stat-total').textContent = accounts.length;
     document.getElementById('stat-tr').textContent = accounts.filter(a => a.role === 'Treasurer').length;
     document.getElementById('stat-en').textContent = accounts.filter(a => a.role === 'Encoder').length;
 }
 
 function renderAccounts() {
-    document.getElementById('accounts-table').innerHTML = accounts.map(a => `
+    const pageRows = renderPagination(
+        'accounts-table',
+        'accounts-pagination-bar',
+        'accounts-pagination-info',
+        'accounts-pagination-controls',
+        accounts,
+        accountsPage,
+        (pg) => { accountsPage = pg; renderAccounts(); }
+    );
+
+    document.getElementById('accounts-table').innerHTML = pageRows.map(a => `
         <tr>
             <td><div class="name-cell"><div class="avatar ${a.role==='Treasurer'?'av-t':'av-e'}">${getInitials(a)}</div>${fullName(a)}</div></td>
             <td style="color:var(--text-muted)">${a.username}</td>
