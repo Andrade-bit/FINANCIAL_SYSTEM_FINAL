@@ -40,7 +40,6 @@
         }
         .sidebar-overlay.open { display: block; }
 
-        /* HAMBURGER */
         .hamburger {
             display: none; background: none; border: none;
             cursor: pointer; padding: 4px;
@@ -132,20 +131,7 @@
         .tx-table tbody tr { border-bottom: 1px solid #f0f2f5; transition: background 0.12s; }
         .tx-table tbody tr:last-child { border-bottom: none; }
         .tx-table tbody tr:hover { background: #f8fafb; }
-        .tx-table tbody td { padding: 13px 16px; vertical-align: middle; }
-
-        .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
-        .badge-income  { background: #dcfce7; color: #15803d; }
-        .badge-expense { background: #fee2e2; color: #b91c1c; }
-
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
-        }
-        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-        .status-approved { background: #dcfce7; color: #15803d; }
-        .status-pending  { background: #fef9c3; color: #a16207; }
-        .status-declined { background: #fee2e2; color: #b91c1c; }
+        .tx-table tbody td { padding: 13px 16px; vertical-align: middle; color: var(--text-main); font-size: 0.83rem; }
 
         .empty-state {
             display: flex; flex-direction: column; align-items: center;
@@ -292,16 +278,12 @@
                         >
                             <td>{{ \Carbon\Carbon::parse($tx->date)->format('M d, Y') }}</td>
                             <td>{{ $tx->user ? $tx->user->firstName . ' ' . $tx->user->lastName : '—' }}</td>
-                            <td>
-                                <span class="badge {{ $tx->type == 'funds' ? 'badge-income' : ($tx->type == 'expenses' ? 'badge-expense' : 'badge-income') }}">
-                                    {{ ucfirst($tx->type) }}
-                                </span>
-                            </td>
+                            <td>{{ ucfirst($tx->type) }}</td>
                             <td>{{ $tx->description }}</td>
                             <td>{{ $tx->expenses_amount > 0 ? '₱' . number_format($tx->expenses_amount, 2) : '—' }}</td>
                             <td>{{ $tx->funds_amount > 0 ? '₱' . number_format($tx->funds_amount, 2) : '—' }}</td>
                             <td>₱{{ number_format($tx->total_amount, 2) }}</td>
-                            <td><span class="status-badge status-{{ strtolower($tx->status) }}">{{ ucfirst($tx->status) }}</span></td>
+                            <td>{{ ucfirst($tx->status) }}</td>
                         </tr>
                         @empty
                         <tr>

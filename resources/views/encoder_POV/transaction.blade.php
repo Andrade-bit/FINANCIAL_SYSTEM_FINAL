@@ -33,7 +33,6 @@
             color: var(--text-main);
         }
 
-        /* On desktop keep overflow hidden for the app shell */
         @media (min-width: 769px) {
             html, body { overflow: hidden; }
         }
@@ -41,7 +40,6 @@
         a { text-decoration: none; }
         .app { display: flex; height: 100vh; }
 
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
@@ -110,7 +108,6 @@
         }
         .btn-logout:hover { background: #a93226; }
 
-        /* MOBILE OVERLAY */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -120,7 +117,6 @@
         }
         .sidebar-overlay.open { display: block; }
 
-        /* HAMBURGER */
         .hamburger {
             display: none;
             background: none;
@@ -139,7 +135,6 @@
             transition: all 0.2s;
         }
 
-        /* MAIN */
         .main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; min-width: 0; }
 
         .header { background: var(--header-bg); padding: 28px 36px 40px; color: white; }
@@ -178,7 +173,6 @@
         }
         .filter-select:focus { border-color: var(--accent); }
 
-        /* TABLE */
         .tx-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
         .tx-table thead tr { background: #f8fafb; border-bottom: 1px solid var(--border); }
         .tx-table thead th {
@@ -190,21 +184,7 @@
         .tx-table tbody tr { border-bottom: 1px solid #f0f2f5; transition: background 0.12s; }
         .tx-table tbody tr:last-child { border-bottom: none; }
         .tx-table tbody tr:hover { background: #f8fafb; }
-        .tx-table tbody td { padding: 13px 16px; vertical-align: middle; }
-
-        .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
-        .badge-income  { background: #dcfce7; color: #15803d; }
-        .badge-expense { background: #fee2e2; color: #b91c1c; }
-
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 0.7rem; font-weight: 600;
-        }
-        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-        .status-approved { background: #dcfce7; color: #15803d; }
-        .status-pending  { background: #fef9c3; color: #a16207; }
-        .status-declined { background: #fee2e2; color: #b91c1c; }
+        .tx-table tbody td { padding: 13px 16px; vertical-align: middle; color: var(--text-main); font-size: 0.83rem; }
 
         .empty-state {
             display: flex; flex-direction: column; align-items: center;
@@ -214,7 +194,6 @@
         .empty-state svg { width: 44px; height: 44px; fill: #d1d5db; }
         .empty-state p { font-size: 0.85rem; }
 
-        /* TOAST */
         #toast-notification {
             position: fixed; top: 24px; right: 24px; z-index: 9999;
             background: #1a1a2e; color: #fff;
@@ -231,7 +210,6 @@
             transform: translateY(0);
         }
 
-        /* ── PAGINATION ── */
         .pagination-bar {
             display: flex;
             align-items: center;
@@ -242,103 +220,50 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .pagination-info {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .pagination-info { font-size: 0.78rem; color: var(--text-muted); }
+        .pagination-controls { display: flex; align-items: center; gap: 4px; }
         .page-btn {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 8px;
-            border: 1px solid var(--border);
-            background: white;
-            color: var(--text-main);
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            cursor: pointer;
+            min-width: 32px; height: 32px; padding: 0 8px;
+            border: 1px solid var(--border); background: white; color: var(--text-main);
+            border-radius: 6px; font-size: 0.78rem; font-family: 'Inter', sans-serif;
+            font-weight: 500; cursor: pointer;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-flex; align-items: center; justify-content: center;
         }
-        .page-btn:hover:not(:disabled) {
-            background: #f0f2f5;
-            border-color: #d1d5db;
-        }
-        .page-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .page-btn:hover:not(:disabled) { background: #f0f2f5; border-color: #d1d5db; }
+        .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ===================== RESPONSIVE ===================== */
-
-        /* Tablet: 481px – 768px */
         @media (max-width: 768px) {
             .app { height: auto; min-height: 100vh; }
             .main { height: auto; overflow-y: visible; }
-
-            /* Sidebar becomes off-canvas drawer */
             .sidebar {
-                position: fixed;
-                top: 0; left: 0;
-                height: 100vh;
-                transform: translateX(-100%);
+                position: fixed; top: 0; left: 0;
+                height: 100vh; transform: translateX(-100%);
             }
             .sidebar.open { transform: translateX(0); }
             .hamburger { display: flex; }
-
-            /* Header padding */
             .header { padding: 20px 20px 32px; }
             .header h1 { font-size: 1.4rem; }
-
-            /* Wrapper margins */
             .transactions-wrapper { margin: 20px 16px; }
-
-            /* Filter bar stacks nicely */
             .filter-bar { flex-direction: column; align-items: stretch; }
             .filter-search { min-width: unset; }
             .filter-select { min-width: unset; width: 100%; }
             .filter-bar-title { margin-right: 0; }
         }
 
-        /* Mobile: up to 480px */
         @media (max-width: 480px) {
             .header { padding: 16px 16px 28px; }
             .header h1 { font-size: 1.2rem; }
             .header p { font-size: 0.8rem; }
-
             .transactions-wrapper { margin: 16px 12px; border-radius: 10px; }
-
             .filter-bar { padding: 12px 14px; gap: 8px; }
-
-            /* Table: hide less important cols, show critical ones */
             .tx-table thead th,
             .tx-table tbody td { padding: 10px 10px; }
-
-            /* Hide Expenses and Funds columns on very small screens, keep total */
-            .col-expenses, .col-funds {
-                display: none;
-            }
-
+            .col-expenses, .col-funds { display: none; }
             .tx-table { font-size: 0.75rem; }
-
-            .badge { font-size: 0.65rem; padding: 2px 7px; }
-            .status-badge { font-size: 0.65rem; padding: 3px 8px; }
         }
 
-        /* Extra small: up to 360px */
         @media (max-width: 360px) {
             .col-treasureid { display: none; }
         }
@@ -346,15 +271,11 @@
 </head>
 <body>
 
-<!-- Toast -->
 <div id="toast-notification"></div>
-
-<!-- Sidebar overlay (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-icon">
@@ -395,11 +316,9 @@
         </div>
     </aside>
 
-    <!-- MAIN -->
     <div class="main">
         <div class="header">
             <div class="header-top">
-                <!-- Hamburger (mobile only) -->
                 <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -450,20 +369,12 @@
                         >
                             <td>{{ \Carbon\Carbon::parse($tx->date)->format('M d, Y') }}</td>
                             <td class="col-treasureid">{{ $tx->user ? $tx->user->firstName . ' ' . $tx->user->lastName : '—' }}</td>
-                            <td>
-                                <span class="badge {{ $tx->type == 'funds' ? 'badge-income' : ($tx->type == 'expenses' ? 'badge-expense' : 'badge-income') }}">
-                                    {{ ucfirst($tx->type) }}
-                                </span>
-                            </td>
+                            <td>{{ ucfirst($tx->type) }}</td>
                             <td>{{ $tx->description }}</td>
                             <td class="col-expenses">{{ $tx->expenses_amount > 0 ? '₱' . number_format($tx->expenses_amount, 2) : '—' }}</td>
                             <td class="col-funds">{{ $tx->funds_amount > 0 ? '₱' . number_format($tx->funds_amount, 2) : '—' }}</td>
                             <td>₱{{ number_format($tx->total_amount, 2) }}</td>
-                            <td>
-                                <span class="status-badge status-{{ strtolower($tx->status) }}">
-                                    {{ ucfirst($tx->status) }}
-                                </span>
-                            </td>
+                            <td>{{ ucfirst($tx->status) }}</td>
                         </tr>
                         @empty
                         <tr>
@@ -479,7 +390,6 @@
                 </table>
             </div>
 
-            <!-- Pagination Bar -->
             <div class="pagination-bar" id="paginationBar">
                 <span class="pagination-info" id="paginationInfo"></span>
                 <div class="pagination-controls" id="paginationControls"></div>
@@ -491,7 +401,6 @@
 
 @if(session('success'))
 <script>
-// @ts-nocheck
 document.addEventListener('DOMContentLoaded', function() {
     showToast("{{ session('success') }}");
 });
@@ -500,7 +409,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @if(session('error'))
 <script>
-// @ts-nocheck
 document.addEventListener('DOMContentLoaded', function() {
     showToast("{{ session('error') }}", true);
 });
@@ -508,7 +416,6 @@ document.addEventListener('DOMContentLoaded', function() {
 @endif
 
 <script>
-// @ts-nocheck
 function showToast(msg, isError = false) {
     const toast = document.getElementById('toast-notification');
     toast.style.borderLeftColor = isError ? '#c0392b' : '#2a9d8f';
@@ -530,7 +437,6 @@ function closeSidebar() {
     document.body.style.overflow = '';
 }
 
-// ── PAGINATION + FILTER ──
 const ROWS_PER_PAGE = 6;
 let currentPage = 1;
 
@@ -564,7 +470,6 @@ function renderPage() {
         row.style.display = (i >= start && i < end) ? '' : 'none';
     });
 
-    // Info text
     const infoEl = document.getElementById('paginationInfo');
     if (totalRows === 0) {
         infoEl.textContent = 'No results';
@@ -572,7 +477,6 @@ function renderPage() {
         infoEl.textContent = `Showing ${start + 1}–${Math.min(end, totalRows)} of ${totalRows} transactions`;
     }
 
-    // Controls
     const controlsEl = document.getElementById('paginationControls');
     controlsEl.innerHTML = '';
 
@@ -615,7 +519,6 @@ function filterTable() {
     renderPage();
 }
 
-// Init on load
 renderPage();
 </script>
 </body>
