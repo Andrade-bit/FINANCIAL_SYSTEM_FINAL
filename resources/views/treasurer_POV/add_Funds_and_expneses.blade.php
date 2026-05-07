@@ -33,9 +33,13 @@
             color: var(--text-main);
         }
 
+        @media (min-width: 1025px) {
+            html, body { overflow: hidden; }
+        }
+
         a { text-decoration: none; }
 
-        .app { display: flex; height: 100vh; overflow: hidden; position: relative; }
+        .app { display: flex; height: 100vh; position: relative; }
 
         /* ── SIDEBAR ── */
         .sidebar {
@@ -46,8 +50,8 @@
             flex-shrink: 0;
             height: 100vh;
             overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
+            transition: transform 0.25s ease;
+            z-index: 200;
         }
 
         /* MOBILE OVERLAY */
@@ -55,8 +59,28 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
+            background: rgba(0,0,0,0.45);
+            z-index: 199;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* HAMBURGER */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            flex-direction: column;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .hamburger span {
+            display: block;
+            width: 22px; height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.2s;
         }
 
         .sidebar-brand {
@@ -142,31 +166,12 @@
         .btn-logout:hover { background: #a93226; }
         .btn-logout svg { width: 14px; height: 14px; fill: white; }
 
-        /* ── MOBILE NAV TOGGLE ── */
-        .mobile-nav-toggle {
-            display: none;
-            background: var(--header-bg);
-            padding: 12px 20px;
-            color: white;
-            align-items: center;
-            gap: 12px;
-        }
-        .menu-btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-family: inherit;
-        }
-
         /* ── MAIN ── */
         .main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; min-width: 0; }
 
         .header { background: var(--header-bg); padding: 28px 36px 40px; color: white; }
-        .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+        .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
         .header p  { font-size: 0.88rem; opacity: 0.75; }
 
         .content { padding: 28px 36px; flex: 1; }
@@ -293,64 +298,45 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .pagination-info {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .pagination-info { font-size: 0.78rem; color: var(--text-muted); }
+        .pagination-controls { display: flex; align-items: center; gap: 4px; }
         .page-btn {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 8px;
+            min-width: 32px; height: 32px; padding: 0 8px;
             border: 1px solid var(--border);
-            background: white;
-            color: var(--text-main);
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
+            background: white; color: var(--text-main);
+            border-radius: 6px; font-size: 0.78rem;
+            font-family: 'Inter', sans-serif; font-weight: 500;
             cursor: pointer;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-flex; align-items: center; justify-content: center;
         }
-        .page-btn:hover:not(:disabled) {
-            background: #f0f2f5;
-            border-color: #d1d5db;
-        }
-        .page-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .page-btn:hover:not(:disabled) { background: #f0f2f5; border-color: #d1d5db; }
+        .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* ══════════════════════════
            RESPONSIVE
         ══════════════════════════ */
         @media (max-width: 1024px) {
+            .app { height: auto; min-height: 100vh; }
+            .main { height: auto; overflow-y: visible; }
+
             .sidebar {
                 position: fixed;
-                left: 0;
+                top: 0; left: 0;
+                height: 100vh;
                 transform: translateX(-100%);
             }
-            .sidebar.active { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
-            .mobile-nav-toggle { display: flex; }
-            .content { padding: 20px 16px; }
-            .header { padding: 22px 20px 32px; }
+            .sidebar.open { transform: translateX(0); }
+            .hamburger { display: flex; }
+
+            .header { padding: 20px 20px 32px; }
             .header h1 { font-size: 1.4rem; }
+            .content { padding: 20px 16px; }
         }
 
         @media (max-width: 600px) {
+            .header { padding: 16px 16px 28px; }
             .header h1 { font-size: 1.25rem; }
             .content { padding: 14px 12px; }
             .table-filters { padding: 12px 14px; gap: 8px; }
@@ -364,7 +350,8 @@
 <!-- Toast -->
 <div id="toast-notification"></div>
 
-<div class="sidebar-overlay" id="overlay"></div>
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
 
@@ -418,14 +405,14 @@
 
     <div class="main">
 
-        <!-- Mobile topbar -->
-        <div class="mobile-nav-toggle">
-            <button class="menu-btn" id="menuToggle">Menu</button>
-            <span style="font-weight:600; font-size: 0.9rem;">Church Finance</span>
-        </div>
-
         <div class="header">
-            <h1>Add Funds & Expenses</h1>
+            <div class="header-top">
+                <!-- Hamburger (mobile only) -->
+                <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <h1>Add Funds & Expenses</h1>
+            </div>
             <p>Review, filter, and manage fund and expense transactions</p>
         </div>
 
@@ -586,17 +573,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 // ── SIDEBAR TOGGLE ─────────────────────────────────────────────────
-const menuToggle = document.getElementById('menuToggle');
-const sidebar    = document.getElementById('sidebar');
-const overlay    = document.getElementById('overlay');
-
-function toggleMenu() {
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
 }
 
-menuToggle.addEventListener('click', toggleMenu);
-overlay.addEventListener('click', toggleMenu);
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
 
 // ── TOAST ──────────────────────────────────────────────────────────
 function showToast(msg, isError = false) {
@@ -634,7 +621,6 @@ function renderPage() {
         row.style.display = (i >= start && i < end) ? '' : 'none';
     });
 
-    // Info text
     const infoEl = document.getElementById('paginationInfo');
     if (totalRows === 0) {
         infoEl.textContent = 'No results';
@@ -642,7 +628,6 @@ function renderPage() {
         infoEl.textContent = `Showing ${start + 1}–${Math.min(end, totalRows)} of ${totalRows} transactions`;
     }
 
-    // Controls
     const controlsEl = document.getElementById('paginationControls');
     controlsEl.innerHTML = '';
 
@@ -685,7 +670,6 @@ function filterTable() {
     renderPage();
 }
 
-// Init on load
 renderPage();
 </script>
 

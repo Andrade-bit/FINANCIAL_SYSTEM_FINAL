@@ -59,6 +59,7 @@
             top: 0;
             overflow-y: auto;
             z-index: 1000;
+            transition: transform 0.25s ease;
         }
 
         .sidebar-overlay {
@@ -67,6 +68,27 @@
             inset: 0;
             background: rgba(0,0,0,0.5);
             z-index: 999;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* ── HAMBURGER ── */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            flex-direction: column;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.2s;
         }
 
         .sidebar-brand {
@@ -175,36 +197,21 @@
             min-width: 0;
         }
 
-        /* ── MOBILE NAV TOGGLE ── */
-        .mobile-nav-toggle {
-            display: none;
-            background: var(--header-bg);
-            padding: 12px 20px;
-            color: white;
-            align-items: center;
-            gap: 12px;
-        }
-        .menu-btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-family: 'Inter', sans-serif;
-        }
-
         .header {
             background: var(--header-bg);
             padding: 28px 36px 40px;
             color: white;
         }
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 4px;
+        }
         .header h1 {
             font-size: 1.75rem;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 4px;
         }
         .header p {
             font-size: 0.88rem;
@@ -884,12 +891,10 @@
                 transform: translateX(-100%);
                 height: 100vh;
                 z-index: 1000;
-                transition: transform 0.25s ease;
             }
-            .sidebar.active { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
-            .mobile-nav-toggle { display: flex; }
-            .header { padding: 22px 20px 32px; }
+            .sidebar.open { transform: translateX(0); }
+            .hamburger { display: flex; }
+            .header { padding: 20px 20px 32px; }
             .content { padding: 20px 16px 50px; }
             .stats-row { grid-template-columns: repeat(2, 1fr); }
             .bottom-row { grid-template-columns: 1fr; }
@@ -916,7 +921,7 @@
 </head>
 <body>
 
-<div class="sidebar-overlay" id="overlay"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
 
@@ -968,13 +973,13 @@
 
     <div class="main">
 
-        <div class="mobile-nav-toggle">
-            <button class="menu-btn" id="menuToggle">Menu</button>
-            <span style="font-weight:600; font-size: 0.9rem;">Church Finance</span>
-        </div>
-
         <div class="header">
-            <h1>Treasurer Dashboard</h1>
+            <div class="header-top">
+                <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <h1>Treasurer Dashboard</h1>
+            </div>
             <p>Manage all financial transactions</p>
         </div>
 
@@ -1284,16 +1289,19 @@
 <script>
 (function () {
 
-    /* ── Sidebar toggle ── */
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar    = document.getElementById('sidebar');
-    const overlay    = document.getElementById('overlay');
-
-    function toggleMenu() {
-        [sidebar, overlay].forEach(el => el.classList.toggle('active'));
+    /* ── Sidebar open/close (hamburger style) ── */
+    function openSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
-    if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
-    if (overlay)    overlay.addEventListener('click', toggleMenu);
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    window.openSidebar  = openSidebar;
+    window.closeSidebar = closeSidebar;
 
     /* ── QA expand/collapse ── */
     document.addEventListener('DOMContentLoaded', function () {

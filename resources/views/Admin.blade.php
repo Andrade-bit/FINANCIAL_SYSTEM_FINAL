@@ -26,15 +26,34 @@
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { font-family: 'Inter', sans-serif; height: 100%; background: var(--page-bg); color: var(--text-main); }
-        .app { display: flex; height: 100vh; }
+        .app { display: flex; min-height: 100vh; position: relative; }
 
         /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-width); background: var(--sidebar-bg);
             display: flex; flex-direction: column; flex-shrink: 0;
             height: 100vh; overflow-y: auto; position: sticky; top: 0;
+            transition: transform 0.25s ease; z-index: 200;
         }
         .sidebar nav { flex: 1; }
+
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 199;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* HAMBURGER */
+        .hamburger {
+            display: none; background: none; border: none;
+            cursor: pointer; padding: 4px;
+            flex-direction: column; gap: 5px; flex-shrink: 0;
+        }
+        .hamburger span {
+            display: block; width: 22px; height: 2px;
+            background: #fff; border-radius: 2px; transition: all 0.2s;
+        }
+
         .sidebar-brand {
             display: flex; align-items: center; gap: 10px;
             padding: 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -80,9 +99,10 @@
         .btn-logout:hover { background: #a93226; }
 
         /* MAIN */
-        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; min-width: 0; }
+        .main { flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow-y: visible; min-width: 0; }
         .header { background: var(--header-bg); padding: 28px 36px 40px; color: white; }
-        .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+        .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
         .header p  { font-size: 0.88rem; opacity: 0.75; }
         .content { padding: 28px 36px; flex: 1; }
 
@@ -118,10 +138,10 @@
             text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;
         }
         .stat-value {
-    font-size: 1.9rem; font-weight: 700;
-    letter-spacing: -0.02em; color: var(--text-main); margin-bottom: 4px;
-    text-align: right;
-}
+            font-size: 1.9rem; font-weight: 700;
+            letter-spacing: -0.02em; color: var(--text-main); margin-bottom: 4px;
+            text-align: right;
+        }
         .stat-desc { font-size: 0.76rem; color: var(--text-muted); }
 
         /* TABLE CARD */
@@ -141,30 +161,6 @@
         td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); white-space: nowrap; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #fafafa; }
-
-        /* MOBILE MENU TOGGLE */
-        .mobile-menu-btn {
-            display: none; background: transparent; border: 1px solid rgba(255,255,255,0.3);
-            color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer;
-            margin-bottom: 15px; font-size: 0.8rem;
-        }
-
-        /* MEDIA QUERIES FOR RESPONSIVENESS */
-        @media (max-width: 850px) {
-            .stats-row { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 768px) {
-            .app { flex-direction: column; overflow-y: auto; }
-            .sidebar { 
-                width: 100%; height: auto; position: relative; display: none; 
-            }
-            .sidebar.mobile-open { display: flex; height: auto; }
-            .main { height: auto; }
-            .mobile-menu-btn { display: inline-block; }
-            .header { padding: 20px; }
-            .content { padding: 20px; }
-        }
 
         /* BADGE */
         .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
@@ -252,55 +248,41 @@
             transform: translateY(0);
         }
 
-        /* ── PAGINATION ── */
+        /* PAGINATION */
         .pagination-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 20px;
-            border-top: 1px solid var(--border);
-            background: white;
-            flex-wrap: wrap;
-            gap: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px; border-top: 1px solid var(--border);
+            background: white; flex-wrap: wrap; gap: 10px;
         }
-        .pagination-info {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .pagination-info { font-size: 0.78rem; color: var(--text-muted); }
+        .pagination-controls { display: flex; align-items: center; gap: 4px; }
         .page-btn {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 8px;
-            border: 1px solid var(--border);
-            background: white;
-            color: var(--text-main);
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            cursor: pointer;
+            min-width: 32px; height: 32px; padding: 0 8px;
+            border: 1px solid var(--border); background: white; color: var(--text-main);
+            border-radius: 6px; font-size: 0.78rem; font-family: 'Inter', sans-serif;
+            font-weight: 500; cursor: pointer;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-flex; align-items: center; justify-content: center;
         }
-        .page-btn:hover:not(:disabled) {
-            background: #f0f2f5;
-            border-color: #d1d5db;
+        .page-btn:hover:not(:disabled) { background: #f0f2f5; border-color: #d1d5db; }
+        .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed; left: 0; top: 0;
+                transform: translateX(-100%); height: 100vh;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .hamburger { display: flex; }
+            .header { padding: 20px 20px 32px; }
+            .header h1 { font-size: 1.4rem; }
+            .content { padding: 20px 16px; }
         }
-        .page-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+
+        @media (max-width: 850px) {
+            .stats-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -308,15 +290,18 @@
 
 <div id="toast-notification"></div>
 
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <div class="app">
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-<div class="brand-icon">
+            <div class="brand-icon">
                 <img src="{{ asset('images/image-removebg-preview (7).svg') }}"
                      alt=""
                      style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover;">
-            </div>            <div>
+            </div>
+            <div>
                 <div class="brand-name">Church Finance</div>
                 <div class="brand-sub">Financial System</div>
             </div>
@@ -341,8 +326,12 @@
 
     <div class="main">
         <div class="header">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-            <h1 id="page-title">Admin Dashboard</h1>
+            <div class="header-top">
+                <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <h1 id="page-title">Admin Dashboard</h1>
+            </div>
             <p id="page-sub">Manage accounts and system users</p>
         </div>
 
@@ -479,9 +468,16 @@ const ROWS_PER_PAGE = 6;
 let dashboardPage = 1;
 let accountsPage  = 1;
 
-// Helper to toggle mobile sidebar
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('mobile-open');
+// ── SIDEBAR ──────────────────────────────────────────────────────
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.body.style.overflow = '';
 }
 
 function fullName(a) { return [a.firstName, a.middleName, a.lastName].filter(Boolean).join(' '); }
@@ -495,13 +491,11 @@ function renderPagination(tableId, barId, infoId, controlsId, rows, currentPage,
     const end        = start + ROWS_PER_PAGE;
     const pageRows   = rows.slice(start, end);
 
-    // Info
     const infoEl = document.getElementById(infoId);
     infoEl.textContent = totalRows === 0
         ? 'No accounts found'
         : `Showing ${start + 1}–${Math.min(end, totalRows)} of ${totalRows} accounts`;
 
-    // Controls
     const controlsEl = document.getElementById(controlsId);
     controlsEl.innerHTML = '';
 
@@ -535,7 +529,6 @@ function renderPagination(tableId, barId, infoId, controlsId, rows, currentPage,
     nextBtn.addEventListener('click', () => onPageChange(currentPage + 1));
     controlsEl.appendChild(nextBtn);
 
-    // Show/hide pagination bar
     document.getElementById(barId).style.display = totalRows === 0 ? 'none' : 'flex';
 
     return pageRows;
@@ -596,9 +589,9 @@ function showPage(page, el) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
     el.classList.add('active');
-    
+
     // Close sidebar on mobile after clicking
-    document.getElementById('sidebar').classList.remove('mobile-open');
+    closeSidebar();
 
     const titles = {
         dashboard: ['Admin Dashboard', 'Manage accounts and system users'],

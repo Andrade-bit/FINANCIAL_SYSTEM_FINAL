@@ -42,8 +42,12 @@
             color: var(--text-main);
         }
 
+        @media (min-width: 1025px) {
+            html, body { overflow: hidden; }
+        }
+
         a { text-decoration: none; color: inherit; }
-        .app { display: flex; height: 100vh; overflow: hidden; position: relative; }
+        .app { display: flex; height: 100vh; position: relative; }
 
         .sidebar {
             width: var(--sidebar-width);
@@ -53,16 +57,37 @@
             flex-shrink: 0;
             height: 100vh;
             overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
+            transition: transform 0.25s ease;
+            z-index: 200;
         }
 
+        /* MOBILE OVERLAY */
         .sidebar-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
+            background: rgba(0,0,0,0.45);
+            z-index: 199;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* HAMBURGER */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            flex-direction: column;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .hamburger span {
+            display: block;
+            width: 22px; height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.2s;
         }
 
         .sidebar-brand {
@@ -72,12 +97,7 @@
             padding: 18px 16px;
             border-bottom: 1px solid rgba(255,255,255,0.07);
         }
-        .brand-icon {
-            width: 38px; height: 38px;
-            background: var(--accent);
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
+        .brand-icon { width: 38px; height: 38px; background: var(--accent); border-radius: 8px; flex-shrink: 0; }
         .brand-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
         .brand-sub  { font-size: 0.68rem; color: rgba(255,255,255,0.45); }
 
@@ -135,33 +155,18 @@
             min-width: 0;
         }
 
-        .mobile-nav-toggle {
-            display: none;
-            background: var(--header-bg);
-            padding: 12px 20px;
-            color: white;
-            align-items: center;
-            gap: 12px;
-        }
-        .menu-btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
         .header {
             background: var(--header-bg);
             padding: 30px 20px 50px;
             color: white;
         }
+        .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
         .header h1 { font-size: 1.5rem; }
+        .header p  { font-size: 0.88rem; opacity: 0.75; }
 
-        .content { 
-            padding: 20px; 
-            flex: 1; 
+        .content {
+            padding: 20px;
+            flex: 1;
             display: flex;
             justify-content: center;
         }
@@ -205,8 +210,6 @@
         }
         .split-panel.funds    { background: var(--funds-bg); border: 1.5px solid var(--funds-border); }
         .split-panel.expenses { background: var(--exp-bg);   border: 1.5px solid var(--exp-border); }
-
-        /* Panel error highlight */
         .split-panel.panel-error {
             border-color: var(--error-red) !important;
             box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
@@ -214,7 +217,6 @@
 
         .field { margin-bottom: 14px; }
         .field label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; }
-
         .field input, .field select, .field textarea {
             width: 100%;
             padding: 10px 12px;
@@ -223,14 +225,10 @@
             font-size: 0.9rem;
             transition: border-color 0.2s;
         }
-
-        /* Input error state */
         .field input.input-error {
             border-color: var(--error-red) !important;
             background-color: var(--error-bg);
         }
-
-        /* Inline error message */
         .error-msg {
             display: none;
             font-size: 0.7rem;
@@ -240,7 +238,6 @@
         }
         .error-msg.show { display: block; }
 
-        /* Global "fill at least one" banner */
         .global-error-banner {
             display: none;
             background: var(--error-bg);
@@ -282,22 +279,6 @@
             color: var(--text-muted);
         }
 
-        @media (max-width: 1024px) {
-            .sidebar { position: fixed; left: 0; transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
-            .mobile-nav-toggle { display: flex; }
-            .content { padding: 15px; }
-            .form-card { padding: 20px; }
-        }
-
-        @media (max-width: 600px) {
-            .split-row { grid-template-columns: 1fr; }
-            .buttons-row { flex-direction: column-reverse; }
-            .btn-save, .btn-cancel { width: 100%; }
-            .header h1 { font-size: 1.25rem; }
-        }
-
         #toast-notification {
             position: fixed; top: 20px; right: 20px; left: 20px;
             max-width: 400px; margin: auto;
@@ -307,21 +288,46 @@
             z-index: 2000;
         }
         #toast-notification.toast-show { opacity: 1; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .app { height: auto; min-height: 100vh; }
+            .main { height: auto; overflow-y: visible; }
+            .sidebar {
+                position: fixed;
+                top: 0; left: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .hamburger { display: flex; }
+            .header { padding: 20px 20px 32px; }
+            .header h1 { font-size: 1.3rem; }
+            .content { padding: 15px; }
+            .form-card { padding: 20px; }
+        }
+
+        @media (max-width: 600px) {
+            .split-row { grid-template-columns: 1fr; }
+            .buttons-row { flex-direction: column-reverse; }
+            .btn-save, .btn-cancel { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
 <div id="toast-notification"></div>
-<div class="sidebar-overlay" id="overlay"></div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="app">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-<div class="brand-icon">
+            <div class="brand-icon">
                 <img src="{{ asset('images/image-removebg-preview (7).svg') }}"
                      alt=""
                      style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover;">
-            </div>            <div>
+            </div>
+            <div>
                 <div class="brand-name">Church Finance</div>
                 <div class="brand-sub">Financial System</div>
             </div>
@@ -352,14 +358,13 @@
     </aside>
 
     <div class="main">
-        <div class="mobile-nav-toggle">
-            <button class="menu-btn" id="menuToggle">Menu</button>
-            <span style="font-weight:600; font-size: 0.9rem;">Church Finance</span>
-        </div>
-
         <div class="header">
-            <div class="header-eyebrow">{{ isset($transaction) ? 'Edit Entry' : 'Add Money' }}</div>
-            <h1>{{ isset($transaction) ? 'Edit Entry' : 'Add Funds & Expenses' }}</h1>
+            <div class="header-top">
+                <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <h1>{{ isset($transaction) ? 'Edit Entry' : 'Add Funds & Expenses' }}</h1>
+            </div>
             <p>{{ isset($transaction) ? 'Update entry details' : 'Record new transaction' }}</p>
         </div>
 
@@ -373,96 +378,58 @@
                     @csrf
                     @if(isset($transaction)) @method('PUT') @endif
 
-                    <!-- Global error banner -->
                     <div class="global-error-banner" id="globalErrorBanner">
                         ⚠️ Please fill in at least one section — Funds or Expenses (Amount + Description both required per section).
                     </div>
 
                     <div class="split-row">
-
                         <!-- FUNDS PANEL -->
                         <div class="split-panel funds" id="fundsPanel">
-                            <div class="panel-heading" style="color: var(--funds-green); font-size:0.7rem; font-weight:700; margin-bottom:15px;">
-                                ADD FUNDS
-                            </div>
+                            <div class="panel-heading" style="color: var(--funds-green); font-size:0.7rem; font-weight:700; margin-bottom:15px;">ADD FUNDS</div>
                             <div class="field">
                                 <label>Amount (₱)</label>
                                 <div class="input-prefix">
                                     <span>₱</span>
-                                    <input
-                                        type="number"
-                                        name="fund_amount"
-                                        id="fund_amount"
-                                        step="0.01"
-                                        min="0"
-                                        placeholder="0.00"
-                                        value="{{ isset($transaction) ? $transaction->funds_amount : '' }}"
-                                    />
+                                    <input type="number" name="fund_amount" id="fund_amount" step="0.01" min="0" placeholder="0.00"
+                                        value="{{ isset($transaction) ? $transaction->funds_amount : '' }}" />
                                 </div>
                                 <span class="error-msg" id="fund_amount_error">Amount is required if filling Funds.</span>
                             </div>
                             <div class="field">
                                 <label>Description</label>
-                                <input
-                                    type="text"
-                                    name="fund_description"
-                                    id="fund_description"
-                                    placeholder="Offering, Tithes..."
-                                    value="{{ isset($transaction) ? $transaction->description : '' }}"
-                                />
+                                <input type="text" name="fund_description" id="fund_description" placeholder="Offering, Tithes..."
+                                    value="{{ isset($transaction) ? $transaction->description : '' }}" />
                                 <span class="error-msg" id="fund_description_error">Description is required if filling Funds.</span>
                             </div>
                         </div>
 
                         <!-- EXPENSES PANEL -->
                         <div class="split-panel expenses" id="expensesPanel">
-                            <div class="panel-heading" style="color: var(--exp-red); font-size:0.7rem; font-weight:700; margin-bottom:15px;">
-                                ADD EXPENSES
-                            </div>
+                            <div class="panel-heading" style="color: var(--exp-red); font-size:0.7rem; font-weight:700; margin-bottom:15px;">ADD EXPENSES</div>
                             <div class="field">
                                 <label>Amount (₱)</label>
                                 <div class="input-prefix">
                                     <span>₱</span>
-                                    <input
-                                        type="number"
-                                        name="expenses_amount"
-                                        id="expenses_amount"
-                                        step="0.01"
-                                        min="0"
-                                        placeholder="0.00"
-                                        value="{{ isset($transaction) ? $transaction->expenses_amount : '' }}"
-                                    />
+                                    <input type="number" name="expenses_amount" id="expenses_amount" step="0.01" min="0" placeholder="0.00"
+                                        value="{{ isset($transaction) ? $transaction->expenses_amount : '' }}" />
                                 </div>
                                 <span class="error-msg" id="expenses_amount_error">Amount is required if filling Expenses.</span>
                             </div>
                             <div class="field">
                                 <label>Description</label>
-                                <input
-                                    type="text"
-                                    name="expenses_description"
-                                    id="expenses_description"
-                                    placeholder="Utilities, Event..."
-                                    value="{{ isset($transaction) ? $transaction->description : '' }}"
-                                />
+                                <input type="text" name="expenses_description" id="expenses_description" placeholder="Utilities, Event..."
+                                    value="{{ isset($transaction) ? $transaction->description : '' }}" />
                                 <span class="error-msg" id="expenses_description_error">Description is required if filling Expenses.</span>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="bottom-fields">
                         <div class="field">
                             <label>Date <span style="font-size:0.65rem; color: var(--text-muted); font-weight:400;">(Today only)</span></label>
-                            <input
-                                type="date"
-                                name="date"
-                                id="dateInput"
-                                class="date-locked"
+                            <input type="date" name="date" id="dateInput" class="date-locked"
                                 value="{{ isset($transaction) ? $transaction->date : date('Y-m-d') }}"
-                                min="{{ date('Y-m-d') }}"
-                                max="{{ date('Y-m-d') }}"
-                                readonly
-                            />
+                                min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" readonly />
                         </div>
                         <div class="field">
                             <label>Notes (Optional)</label>
@@ -483,14 +450,17 @@
 </div>
 
 <script>
-    // ─── Sidebar ──────────────────────────────────────────────────
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar    = document.getElementById('sidebar');
-    const overlay    = document.getElementById('overlay');
-    menuToggle.addEventListener('click', () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); });
-    overlay.addEventListener('click',   () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); });
+    function openSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+    }
 
-    // ─── Toast ────────────────────────────────────────────────────
     function showToast(msg, isError = false) {
         const toast = document.getElementById('toast-notification');
         toast.style.borderLeft = `4px solid ${isError ? '#c0392b' : '#2a9d8f'}`;
@@ -499,17 +469,12 @@
         setTimeout(() => toast.classList.remove('toast-show'), 3500);
     }
 
-    // ─── Date Lock ───────────────────────────────────────────────
     const dateInput = document.getElementById('dateInput');
     const today     = new Date().toISOString().split('T')[0];
     dateInput.addEventListener('change', function () {
-        if (this.value !== today) {
-            this.value = today;
-            showToast("Only today's date is allowed.", true);
-        }
+        if (this.value !== today) { this.value = today; showToast("Only today's date is allowed.", true); }
     });
 
-    // ─── Elements ────────────────────────────────────────────────
     const form              = document.getElementById('transactionForm');
     const fundAmountInput   = document.getElementById('fund_amount');
     const fundDescInput     = document.getElementById('fund_description');
@@ -519,124 +484,71 @@
     const expensesPanel     = document.getElementById('expensesPanel');
     const globalErrorBanner = document.getElementById('globalErrorBanner');
 
-    // ─── Helpers ─────────────────────────────────────────────────
     function setError(inputEl, errorId, show) {
         const msg = document.getElementById(errorId);
         inputEl.classList.toggle('input-error', show);
         msg.classList.toggle('show', show);
     }
-
     function clearPanel(panel, inputs, errorIds) {
         panel.classList.remove('panel-error');
         inputs.forEach((el, i) => setError(el, errorIds[i], false));
     }
+    function isFundFilled() { return fundAmountInput.value.trim() !== '' || fundDescInput.value.trim() !== ''; }
+    function isExpFilled()  { return expAmountInput.value.trim() !== '' || expDescInput.value.trim() !== ''; }
 
-    function isFundFilled() {
-        return fundAmountInput.value.trim() !== '' || fundDescInput.value.trim() !== '';
-    }
-    function isExpFilled() {
-        return expAmountInput.value.trim() !== '' || expDescInput.value.trim() !== '';
-    }
-
-    // Clear global banner when user starts typing in either panel
     [fundAmountInput, fundDescInput, expAmountInput, expDescInput].forEach(el => {
         el.addEventListener('input', () => {
-            // If either panel now has something, hide global banner
-            if (isFundFilled() || isExpFilled()) {
-                globalErrorBanner.classList.remove('show');
-            }
-            // Clear inline errors for fund panel if user is typing there
+            if (isFundFilled() || isExpFilled()) globalErrorBanner.classList.remove('show');
             if (el === fundAmountInput || el === fundDescInput) {
                 if (isFundFilled()) clearPanel(fundsPanel, [fundAmountInput, fundDescInput], ['fund_amount_error', 'fund_description_error']);
             }
-            // Clear inline errors for expense panel if user is typing there
             if (el === expAmountInput || el === expDescInput) {
                 if (isExpFilled()) clearPanel(expensesPanel, [expAmountInput, expDescInput], ['expenses_amount_error', 'expenses_description_error']);
             }
         });
     });
 
-    // ─── Submit Validation ───────────────────────────────────────
     form.addEventListener('submit', function (e) {
         let isValid = true;
-
         const fundAmt  = fundAmountInput.value.trim();
         const fundDesc = fundDescInput.value.trim();
         const expAmt   = expAmountInput.value.trim();
         const expDesc  = expDescInput.value.trim();
-
         const fundStarted = fundAmt !== '' || fundDesc !== '';
         const expStarted  = expAmt  !== '' || expDesc  !== '';
 
-        // ── Rule: at least one section must be filled ──
         if (!fundStarted && !expStarted) {
             globalErrorBanner.classList.add('show');
             fundsPanel.classList.add('panel-error');
             expensesPanel.classList.add('panel-error');
             showToast('Please fill in at least Funds or Expenses.', true);
-            e.preventDefault();
-            return;
+            e.preventDefault(); return;
         }
-
         globalErrorBanner.classList.remove('show');
 
-        // ── Rule: if Funds section is partially filled, both fields are required ──
         if (fundStarted) {
-            if (fundAmt === '' || parseFloat(fundAmt) <= 0) {
-                setError(fundAmountInput, 'fund_amount_error', true);
-                fundsPanel.classList.add('panel-error');
-                isValid = false;
-            } else {
-                setError(fundAmountInput, 'fund_amount_error', false);
-            }
-
-            if (fundDesc === '') {
-                setError(fundDescInput, 'fund_description_error', true);
-                fundsPanel.classList.add('panel-error');
-                isValid = false;
-            } else {
-                setError(fundDescInput, 'fund_description_error', false);
-            }
-
-            if (isValid || (!isValid && fundAmt !== '' && fundDesc !== '')) {
-                fundsPanel.classList.remove('panel-error');
-            }
+            if (fundAmt === '' || parseFloat(fundAmt) <= 0) { setError(fundAmountInput, 'fund_amount_error', true); fundsPanel.classList.add('panel-error'); isValid = false; }
+            else setError(fundAmountInput, 'fund_amount_error', false);
+            if (fundDesc === '') { setError(fundDescInput, 'fund_description_error', true); fundsPanel.classList.add('panel-error'); isValid = false; }
+            else setError(fundDescInput, 'fund_description_error', false);
+            if (isValid) fundsPanel.classList.remove('panel-error');
         } else {
             clearPanel(fundsPanel, [fundAmountInput, fundDescInput], ['fund_amount_error', 'fund_description_error']);
         }
 
-        // ── Rule: if Expenses section is partially filled, both fields are required ──
         if (expStarted) {
             let expValid = true;
-            if (expAmt === '' || parseFloat(expAmt) <= 0) {
-                setError(expAmountInput, 'expenses_amount_error', true);
-                expensesPanel.classList.add('panel-error');
-                isValid = false;
-                expValid = false;
-            } else {
-                setError(expAmountInput, 'expenses_amount_error', false);
-            }
-
-            if (expDesc === '') {
-                setError(expDescInput, 'expenses_description_error', true);
-                expensesPanel.classList.add('panel-error');
-                isValid = false;
-                expValid = false;
-            } else {
-                setError(expDescInput, 'expenses_description_error', false);
-            }
-
+            if (expAmt === '' || parseFloat(expAmt) <= 0) { setError(expAmountInput, 'expenses_amount_error', true); expensesPanel.classList.add('panel-error'); isValid = false; expValid = false; }
+            else setError(expAmountInput, 'expenses_amount_error', false);
+            if (expDesc === '') { setError(expDescInput, 'expenses_description_error', true); expensesPanel.classList.add('panel-error'); isValid = false; expValid = false; }
+            else setError(expDescInput, 'expenses_description_error', false);
             if (expValid) expensesPanel.classList.remove('panel-error');
         } else {
             clearPanel(expensesPanel, [expAmountInput, expDescInput], ['expenses_amount_error', 'expenses_description_error']);
         }
 
-        if (!isValid) {
-            e.preventDefault();
-            showToast('Please complete all started fields.', true);
-        }
+        if (!isValid) { e.preventDefault(); showToast('Please complete all started fields.', true); }
     });
 </script>
-
 </body>
 </html>
